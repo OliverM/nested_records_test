@@ -6,12 +6,7 @@
 
 module("NestedRecordsTest.Parent");
 
-// TODO: Replace with real unit test for Parent
-test("test description", function() {
-  var expected = "test";
-  var result   = "test";
-  equals(result, expected, "test should equal test");
-});
+
 
 // following all worked as they should:
 // store = NestedRecordsTest.store
