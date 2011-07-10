@@ -86,6 +86,30 @@ NestedRecordsTest = SC.Application.create(
 	
 	getGreatGrandChildren: function(){
 		return this.getGrandChild().get('greatGrandChildren');
+	},
+	
+	// series of tests displaying the issue
+	runTests: function(){
+		
+		// name the objects of interest
+		var parent = NestedRecordsTest.store.find(NestedRecordsTest.Parent).objectAt(0);
+		var children = parent.get('testChildren');
+		var grandChildren = children.objectAt(0).get('grandChildren');
+		
+		console.log('Test adding objects with one level of nesting to collection of an object with two levels of nesting.');
+		console.log('Pushing three grandchildren...');
+		grandChildren.pushObject(NestedRecordsTest.createGrandChild());
+		grandChildren.pushObject(NestedRecordsTest.createGrandChild());
+		grandChildren.pushObject(NestedRecordsTest.createGrandChild());
+		console.log('Total number of grandchildren should be 4. Actual number: %@'.fmt(grandChildren.get('length')));
+		
+		console.log('Test adding objects with two level of nesting to collection of an object with three levels of nesting.');
+		console.log('Pushing three children...');
+		children.pushObject(NestedRecordsTest.createChild());
+		children.pushObject(NestedRecordsTest.createChild()); // fails
+		children.pushObject(NestedRecordsTest.createChild()); // fails
+		console.log('Total number of children should be 4. Actual number: %@'.fmt(grandChildren.get('length')));
+		
 	}
 
 }) ;

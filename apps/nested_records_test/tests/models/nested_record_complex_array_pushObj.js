@@ -180,7 +180,7 @@ test("Push created child records to a parent record's array of children", functi
 	tPChildren.pushObject(ChildRecordA);
 	equals(tPChildren.get('length'), 2, "Pushing the first child record onto the parent's children gives a children length of 2.");
 
-	tPChildren.pushObject(ChildRecordB); // FAILS currently with a stack blowout - OM 100511
+	tPChildren.pushObject(ChildRecordB); // FAILS in full app with a stack blowout - OM 100711
 	equals(tPChildren.get('length'), 3, "Pushing the second child record onto the parent's children gives a children length of 3.");
 	
 });
@@ -212,7 +212,7 @@ test("Push child dictionaries to a parent record's array of children", function(
 	tPChildren.pushObject(ChildDictionaryC);
 	equals(tPChildren.get('length'), 2, "Pushing the first child dictionary onto the parent's children gives a children length of 2.");
 
-	tPChildren.pushObject(ChildDictionaryD); // FAILS currently with a stack blowout - OM 100511
+	tPChildren.pushObject(ChildDictionaryD); 
 	equals(tPChildren.get('length'), 3, "Pushing the second child dictionary onto the parent's children gives a children length of 3.");
 	
 });
