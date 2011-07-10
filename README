@@ -1,6 +1,17 @@
 ==========================================================================
 Project:   NestedRecordsTest
-Copyright: @2011 My Company, Inc.
 ==========================================================================
 
-TODO: Describe Your Project
+This is a minimal app of simple nested record definitions to show an issue where if you:
+- create a nested record of three or more levels with collections of nested records on each level
+- then push a new nested record with two or more levels of nesting onto an existing record's collection of same
+- then do the same again
+
+... you'll get a stack blowout.
+
+The issue doesn't appear in the testing environment, so I created this minimal app to show the issue.
+
+Run NestedRecordsTest.runTests() in the console to see the issue in action. This is defined in core.js.
+
+I've created an analogous test case in the models folder, which I could tweak if anyone knew how to make the issue appear in the testing environment. That's at:
+https://github.com/OliverM/nested_records_test/blob/master/apps/nested_records_test/tests/models/nested_record_complex_array_pushObj.js
