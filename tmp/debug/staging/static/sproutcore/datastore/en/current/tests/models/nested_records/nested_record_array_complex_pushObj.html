@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <script>
+    var SC_benchmarkPreloadEvents = { headStart: new Date().getTime() };
+    </script>
+    
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <link rel="apple-touch-icon" href="" />
+    <link rel="apple-touch-startup-image" media="screen and (orientation:portrait)" href="" /> 
+    <link rel="apple-touch-startup-image" media="screen and (orientation:landscape)" href="" />
+    <link rel="shortcut icon" href="" type="image/x-icon" />
+    
+    <title>Sproutcore Datastore</title>
+  <script type="text/javascript">String.preferredLanguage = "en";</script>
+<script type="text/javascript">
+/* >>>>>>>>>> BEGIN source/core.js */
+// ==========================================================================
+// Project:   SproutCore - JavaScript Application Framework
+// Copyright: ©2006-2011 Strobe Inc. and contributors.
+//            Portions ©2008-2011 Apple Inc. All rights reserved.
+// License:   Licensed under MIT license (see license.js)
+// ==========================================================================
+
+
+/* >>>>>>>>>> BEGIN source/system/browser.js */
+// ==========================================================================
+// Project:   SproutCore - JavaScript Application Framework
+// Copyright: ©2006-2011 Strobe Inc. and contributors.
+//            Portions ©2008-2011 Apple Inc. All rights reserved.
+// License:   Licensed under MIT license (see license.js)
+// ==========================================================================
+
+window.SC = window.SC || { MODULE_INFO: {}, LAZY_INSTANTIATION: {} };
+
+SC._detectBrowser = function(userAgent, language) {
+  var version, webkitVersion, browser = {};
+
+  userAgent = (userAgent || navigator.userAgent).toLowerCase();
+  language = language || navigator.language || navigator.browserLanguage;
+
+  // Gibberish at the end is to determine when the browser version is done
+  version = browser.version = (userAgent.match( /.*(?:rv|chrome|webkit|opera|ie)[\/: ](.+?)([ \);]|$)/ ) || [])[1];
+  webkitVersion = (userAgent.match( /webkit\/(.+?) / ) || [])[1];
+
+  /**
+    @name SC.browser.isWindows
+    @type Boolean
+  */
+  browser.windows = browser.isWindows = !!/windows/.test(userAgent);
+  
+  /**
+    @name SC.browser.isMac
+    @type Boolean
+  */
+  browser.mac = browser.isMac = !!/macintosh/.test(userAgent) || (/mac os x/.test(userAgent) && !/like mac os x/.test(userAgent));
+  
+  /**
+    @name SC.browser.isiPhone
+    @type Boolean
+  */
+  browser.iPhone = browser.isiPhone = !!/iphone/.test(userAgent);
+  
+  /**
+    @name SC.browser.isiPod
+    @type Boolean
+  */
+  browser.iPod = browser.isiPod = !!/ipod/.test(userAgent);
+  
+  /**
+    @name SC.browser.isiPad
+    @type Boolean
+  */
+  browser.iPad = browser.isiPad = !!/ipad/.test(userAgent);
+  
+  /**
+    @name SC.browser.isiOS
+    @type Boolean
+  */
+  browser.iOS = browser.isiOS = browser.iPhone || browser.iPod || browser.iPad;
+  
+  /**
+    @name SC.browser.isAndroid
+    @type Boolean
+  */
+  browser.android = browser.isAndroid = !!/android/.test(userAgent);
+
+  /**
+    @name SC.browser.opera
+    @type String
+  */
+  browser.opera = /opera/.test(userAgent) ? version : 0;
+  
+  /**
+    @name SC.browser.isOpera
+    @type Boolean
+  */
+  browser.isOpera = !!browser.opera;
+
+  /**
+    @name SC.browser.msie
+    @type String
+  */
+  browser.msie = /msie/.test(userAgent) && !browser.opera ? version : 0;
+  
+  /**
+    @name SC.browser.isIE
+    @type Boolean
+  */
+  browser.isIE = !!browser.msie;
+  
+  /**
+    @name SC.browser.isIE8OrLower
+    @type Boolean
+  */
+  browser.isIE8OrLower = !!(browser.msie && parseInt(browser.msie, 10) <= 8);
+
+  /**
+    @name SC.browser.mozilla
+    @type String
+  */
+  browser.mozilla = /mozilla/.test(userAgent) && !/(compatible|webkit|msie)/.test(userAgent) ? version : 0;
+  
+  /**
+    @name SC.browser.isMozilla
+    @type Boolean
+  */
+  browser.isMozilla = !!browser.mozilla;
+
+  /**
+    @name SC.browser.webkit
+    @type String
+  */
+  browser.webkit = /webkit/.test(userAgent) ? webkitVersion : 0;
+  
+  /**
+    @name SC.browser.isWebkit
+    @type Boolean
+  */
+  browser.isWebkit = !!browser.webkit;
+
+  /**
+    @name SC.browser.chrome
+    @type String
+  */
+  browser.chrome = /chrome/.test(userAgent) ? version: 0;
+  
+  /**
+    @name SC.browser.isChrome
+    @type Boolean
+  */
+  browser.isChrome = !!browser.chrome;
+
+  /**
+    @name SC.browser.mobileSafari
+    @type String
+  */
+  browser.mobileSafari = /apple.*mobile.*safari/.test(userAgent) && browser.iOS ? webkitVersion : 0;
+  
+  /**
+    @name SC.browser.isMobileSafari
+    @type Boolean
+  */
+  browser.isMobileSafari = !!browser.mobileSafari;
+
+  /**
+    @name SC.browser.iPadSafari
+    @type String
+  */
+  browser.iPadSafari = browser.iPad && browser.isMobileSafari ? webkitVersion : 0;
+  
+  /**
+    @name SC.browser.isiPadSafari
+    @type Boolean
+  */
+  browser.isiPadSafari = !!browser.iPadSafari;
+
+  /**
+    @name SC.browser.iPhoneSafari
+    @type String
+  */
+  browser.iPhoneSafari = browser.iPhone && browser.isMobileSafari ? webkitVersion : 0;
+  
+  /**
+    @name SC.browser.isiPhoneSafari
+    @type Boolean
+  */
+  browser.isiPhoneSafari = !!browser.iphoneSafari;
+
+  /**
+    @name SC.browser.iPodSafari
+    @type String
+  */
+  browser.iPodSafari = browser.iPod && browser.isMobileSafari ? webkitVersion : 0;
+  
+  /**
+    @name SC.browser.isiPodSafari
+    @type Boolean
+  */
+  browser.isiPodSafari = !!browser.iPodSafari;
+
+  /**
+    @name SC.browser.safari
+    @type String
+  */
+  browser.safari = browser.webkit && !browser.chrome && !browser.iOS && !browser.android ? webkitVersion : 0;
+  
+  /**
+    @name SC.browser.isSafari
+    @type Boolean
+  */
+  browser.isSafari = !!browser.safari;
+
+  /**
+    @name SC.browser.language
+    @type String
+  */
+  browser.language = language.split('-', 1)[0];
+  
+  /**
+    Possible values:
+    
+      - 'msie'
+      - 'mozilla'
+      - 'chrome'
+      - 'safari'
+      - 'opera'
+      - 'mobile-safari'
+      - 'unknown'
+
+    @name SC.browser.current
+    @type String
+    @default 'unknown'
+  */
+  browser.current = browser.msie ? 'msie' : browser.mozilla ? 'mozilla' : browser.chrome ? 'chrome' : browser.safari ? 'safari' : browser.opera ? 'opera' : browser.mobileSafari ? 'mobile-safari' : browser.android ? 'android' : 'unknown';
+  return browser;
+};
+
+
+/** @class
+  
+  Contains information about the browser environment that SproutCore
+  is running in. String properties, such as `SC.browser.webkit` or
+  `SC.browser.msie`, will have a value that represents the browser build
+  number if that browser is being used. Otherwise, they will have a
+  falsey value. For convenience, Boolean counterparts for all of the
+  versioned properties are provided.
+  
+  @since SproutCore 1.0
+*/
+SC.browser = SC._detectBrowser();
+
+/* >>>>>>>>>> BEGIN source/system/bench.js */
+// ==========================================================================
+// Project:   SproutCore - JavaScript Application Framework
+// Copyright: ©2006-2011 Strobe Inc. and contributors.
+//            Portions ©2008-2011 Apple Inc. All rights reserved.
+// License:   Licensed under MIT license (see license.js)
+// ==========================================================================
+/*global SC_benchmarkPreloadEvents*/
+// sc_require("system/browser")
+if (typeof SC_benchmarkPreloadEvents !== "undefined") {
+  SC.benchmarkPreloadEvents = SC_benchmarkPreloadEvents;
+  SC_benchmarkPreloadEvents = undefined;
+} else {
+  SC.benchmarkPreloadEvents = { headStart: new Date().getTime() };
+}
+/* >>>>>>>>>> BEGIN source/system/loader.js */
+// ==========================================================================
+// Project:   SproutCore - JavaScript Application Framework
+// Copyright: ©2006-2011 Strobe Inc. and contributors.
+//            Portions ©2008-2011 Apple Inc. All rights reserved.
+// License:   Licensed under MIT license (see license.js)
+// ==========================================================================
+
+// sc_require("system/browser");
+
+SC.setupBodyClassNames = function() {
+  var el = document.body ;
+  if (!el) return ;
+  var browser, platform, shadows, borderRad, classNames, style;
+  browser = SC.browser.current ;
+  platform = SC.browser.windows ? 'windows' : SC.browser.mac ? 'mac' : 'other-platform' ;
+  style = document.documentElement.style;
+  shadows = (style.MozBoxShadow !== undefined) || 
+                (style.webkitBoxShadow !== undefined) ||
+                (style.oBoxShadow !== undefined) ||
+                (style.boxShadow !== undefined);
+  
+  borderRad = (style.MozBorderRadius !== undefined) || 
+              (style.webkitBorderRadius !== undefined) ||
+              (style.oBorderRadius !== undefined) ||
+              (style.borderRadius !== undefined);
+  
+  classNames = el.className ? el.className.split(' ') : [] ;
+  if(shadows) classNames.push('box-shadow');
+  if(borderRad) classNames.push('border-rad');
+  classNames.push(browser) ;
+  if (browser === 'chrome') classNames.push('safari');
+  classNames.push(platform) ;
+  
+  var ieVersion = parseInt(SC.browser.msie,10);
+  if (ieVersion) {
+    if (ieVersion === 7) {
+      classNames.push('ie7');
+    } 
+    else if (ieVersion === 8) {
+      classNames.push('ie8');
+    }
+    else if (ieVersion === 9) {
+      classNames.push('ie9');
+    }
+  }
+  
+  if (SC.browser.mobileSafari) classNames.push('mobile-safari') ;
+  if ('createTouch' in document) classNames.push('touch');
+  el.className = classNames.join(' ') ;
+} ;
+
+
+</script>
+<script type="text/javascript">SC.buildMode = "debug"; 
+ SC.urlPrefix = ""; </script>
+
+
+    <script>
+      (function() { 
+        var styles = [];
+        if (window.devicePixelRatio == 2 || window.location.search.indexOf("2x") > -1) {
+          styles = ["/static/sproutcore/testing/en/current/stylesheet.css?1307720226"];
+        } else {
+          styles = ["/static/sproutcore/testing/en/current/stylesheet.css?1307720226"];
+        }
+
+        var head = document.getElementsByTagName("head")[0];
+        var len = styles.length, idx;
+        for (idx = 0; idx < len; idx++) {
+          var css   = document.createElement('link');
+          css.rel   = 'stylesheet';
+          css.type  = 'text/css';
+          css.href  = styles[idx];
+          css.media = 'screen'
+          head.appendChild(css);
+        }
+      })();
+    </script>
+
+    
+    <script>
+      SC.benchmarkPreloadEvents['headEnd'] = new Date().getTime();
+    </script>
+  </head>
+    
+  <body class="sc-theme focus">  
+    <script>
+    SC.benchmarkPreloadEvents['bodyStart'] = new Date().getTime();
+    </script>
+<script type="text/javascript">
+// ==========================================================================
+// Project:   SproutCore - JavaScript Application Framework
+// Copyright: ©2006-2011 Strobe Inc. and contributors.
+//            Portions ©2008-2011 Apple Inc. All rights reserved.
+// License:   Licensed under MIT license (see license.js)
+// ==========================================================================
+
+// sc_resource('setup_body_class_names'); // publish into inline format
+
+if (SC.setupBodyClassNames) SC.setupBodyClassNames() ;
+
+</script>
+
+
+  <script type="text/javascript" src="/static/sproutcore/jquery/en/current/javascript.js?1307720226"></script>
+  <script type="text/javascript" src="/static/sproutcore/debug/en/current/javascript.js?1307720226"></script>
+  <script type="text/javascript" src="/static/sproutcore/testing/en/current/javascript.js?1307720226"></script>
+  <script type="text/javascript" src="/static/sproutcore/runtime/en/current/javascript.js?1307720226"></script>
+  <script type="text/javascript" src="/static/sproutcore/datetime/core/en/current/javascript.js?1307720226"></script>
+  <script type="text/javascript" src="/static/sproutcore/datastore/en/current/javascript.js?1307720225"></script>
+<script type="text/javascript">
+if (typeof SC !== "undefined") {
+  SC.mode = "TEST_MODE";
+  SC.filename = "static/sproutcore/datastore/en/current/tests/models/nested_records/nested_record_array_complex_pushObj.js"; 
+}
+(function() {
+/**
+ * Nested Record Array Multiple pushObject() Unit Test 
+ *
+ * @author Oliver Mooney
+ */
+
+var NestedRecordsTest, store;
+
+module("Complex SC.Record: Parent > Array of Children > Array of Grandchildren > Array of Greatgrandchildren"), {
+	setup: function(){
+		
+		NestedRecordsTest = SC.Object.create({
+			store: SC.Store.create()
+		});
+
+		window.NestedRecordsTest = NestedRecordsTest;
+		store = NestedRecordsTest.store;
+
+		// nested record hierarchy - no polymorphism necessary for this test
+
+		NestedRecordsTest.Parent = SC.Record.extend(
+			nestedRecordNamespace: NestedRecordsTest,
+			parentName: SC.Record.attr(String),
+			children: SC.Record.toMany('NestedRecordsTest.Child', {isNested:YES})
+		}) ;
+
+		NestedRecordsTest.Child = SC.Record.extend(
+			nestedRecordNamespace: NestedRecordsTest,
+		  childName: SC.Record.attr(String),
+			grandChildren: SC.Record.toMany('NestedRecordsTest.Grandchild', {isNested:YES})
+
+		}) ;
+
+		NestedRecordsTest.Grandchild = SC.Record.extend(
+			nestedRecordNamespace: NestedRecordsTest,
+		  grandchildName: SC.Record.attr(String),
+			greatGrandChildren: SC.Record.toMany('NestedRecordsTest.GreatGrandchild', {isNested:YES})
+		}) ;
+
+		NestedRecordsTest.GreatGrandchild = SC.Record.extend(
+			nestedRecordNamespace: NestedRecordsTest,
+		  greatGrandchildName: SC.Record.attr(String)
+		}) ;
+		
+		// create sample records
+		SC.RunLoop.begin();
+		testParent = store.createRecord(NestedRecordsTest.Parent, {
+			parentName: 'Parent1',
+			children: [
+			{type: 'Child', childName:'Child1', grandChildren: [
+				{type: 'Grandchild', grandchildName: 'Grandchild1', greatGrandChildren: [
+					{type: 'GreatGrandchild', greatGrandchildName: 'GreatGrandchild1'}]
+				}]
+			}]
+		});
+		
+		ChildRecordA = store.createRecord(NestedRecordsTest.Child, {
+			childName: 'ChildA', grandChildren: [
+				{type: 'Grandchild', grandchildName: 'GrandchildA', greatGrandChildren: [
+					{type: 'GreatGrandchild', greatGrandchildName: 'GreatGrandchildA'}]
+				}]
+			}]
+		});
+		
+		ChildRecordB = store.createRecord(NestedRecordsTest.Child, {
+			childName: 'ChildB', grandChildren: [
+				{type: 'Grandchild', grandchildName: 'GrandchildB', greatGrandChildren: [
+					{type: 'GreatGrandchild', greatGrandchildName: 'GreatGrandchildB'}]
+				}]
+			}]
+		});
+		
+		GrandchildRecordA = store.createRecord(NestedRecordsTest.Grandchild, {
+			grandchildName: 'GrandchildM', greatGrandChildren: [
+				{type: 'GreatGrandchild', greatGrandchildName: 'GreatGrandchildM'}
+			]
+		});
+		
+		GrandchildRecordB = store.createRecord(NestedRecordsTest.Grandchild, {
+			grandchildName: 'GrandchildN', greatGrandChildren: [
+				{type: 'GreatGrandchild', greatGrandchildName: 'GreatGrandchildN'}
+			]
+		});
+		
+		GreatGrandchildRecordA = store.createRecord(NestedRecordsTest.GreatGrandchild, {
+			greatGrandchildName: 'GreatGrandchildS'
+		});
+		
+		GreatGrandchildRecordB = store.createRecord(NestedRecordsTest.GreatGrandchild, {
+			greatGrandchildName: 'GreatGrandchildT'
+		});
+		
+		
+		// mirror sample nested records with dictionaries
+		ChildDictionaryC = {
+			type: 'Child', 
+			childName: 'ChildC', 
+			grandChildren: [
+				{type: 'Grandchild', grandchildName: 'GrandchildC', greatGrandChildren: [
+					{type: 'GreatGrandchild', greatGrandchildName: 'GreatGrandchildC'}]
+				}]
+			};
+		
+		ChildDictionaryD = {
+			type: 'Child', 
+			childName: 'ChildD', 
+			grandChildren: [
+				{type: 'Grandchild', grandchildName: 'GrandchildD', greatGrandChildren: [
+					{type: 'GreatGrandchild', greatGrandchildName: 'GreatGrandchildD'}]
+				}]
+			};
+	
+		GrandchildDictionaryC = {
+			type: 'Grandchild'
+			grandchildName: 'GrandchildM', greatGrandChildren: [
+				{type: 'GreatGrandchild', greatGrandchildName: 'GreatGrandchildM'}
+			]
+		};
+
+		GrandchildDictionaryD = {
+			type: 'Grandchild'
+			grandchildName: 'GrandchildN', 
+			greatGrandChildren: [
+				{type: 'GreatGrandchild', greatGrandchildName: 'GreatGrandchildN'}
+			]
+		};
+
+		GreatGrandchildDictionaryC = {
+			type: 'GreatGrandchild'
+			greatGrandchildName: 'GreatGrandchildS'
+		};
+
+		GreatGrandchildDictionaryD = {
+			type: 'GreatGrandchild'
+			greatGrandchildName: 'GreatGrandchildT'
+		};
+
+		SC.RunLoop.end();
+	}
+	
+	teardown: function(){
+		delete NestedRecordTest.Parent;
+    delete NestedRecordTest.Child;
+    delete NestedRecordTest.Grandchild;
+    delete NestedRecordTest.GreatGrandchild;
+    delete window.NestedRecordTest;
+    NestedRecordTest = null;
+    testParent = null;
+    ChildRecordA = null;
+    ChildRecordB = null;
+    store = null;
+	}
+});
+
+test("Push created great-grandchild records to a grandchild's array of great-grandchildren", function(){
+	var tPGreatGrandChildren = testParent.get('children').get('grandChildren').get('greatGrandChildren');
+	tPGrandChildren.pushObject(GreatGrandchildRecordA);
+	equals(tPGrandChildren.get('length'), 2, "Pushing the first great-grandhild record onto the grandchild's great-grandchildren gives a grandchildren length of 2.")
+
+	tPGrandChildren.pushObject(GreatGrandchildRecordB);
+	equals(tPGrandChildren.get('length'), 3, "Pushing the second great-grandhild record onto the grandchild's great-grandchildren gives a grandchildren length of 3.")
+	
+});
+
+test("Push created grandchild records to a child's array of grandchildren", function(){
+	var tPGrandChildren = testParent.get('children').get('grandChildren');
+	tPGrandChildren.pushObject(GrandchildRecordA);
+	equals(tPGrandChildren.get('length'), 2, "Pushing the first grandchild record onto the child's grandchildren gives a grandchildren length of 2.")
+
+	tPGrandChildren.pushObject(GrandchildRecordB);
+	equals(tPGrandChildren.get('length'), 3, "Pushing the second grandchild record onto the child's grandchildren gives a grandchildren length of 3.")
+
+});
+
+test("Push created child records to a parent record's array of children", function(){
+	var tPChildren = testParent.get('children');
+	children.pushObject(ChildRecordA);
+	equals(children.get('length'), 2, "Pushing the first child record onto the parent's children gives a children length of 2.")
+
+	children.pushObject(ChildRecordB); // FAILS currently with a stack blowout - OM 100511
+	equals(children.get('length'), 3, "Pushing the second child record onto the parent's children gives a children length of 3.")
+	
+});
+
+
+
+test("Push great-grandchild dictionaries to a grandchild's array of great-grandchildren", function(){
+	var tPGreatGrandChildren = testParent.get('children').get('grandChildren').get('greatGrandChildren');
+	tPGreatGrandChildren.pushObject(GreatGrandchildDictionaryC);
+	equals(tPGrandChildren.get('length'), 2, "Pushing the first great-grandchild dictionary onto the grandchild's great-grandchildren gives a grandchildren length of 2.")
+
+	tPGrandChildren.pushObject(GreatGrandchildDictionaryD);
+	equals(tPGrandChildren.get('length'), 3, "Pushing the second great-grandchild dictionary onto the grandchild's great-grandchildren gives a grandchildren length of 3.")
+
+});
+
+test("Push grandchild dictionaries to a child's array of grandchildren", function(){
+	var tPGrandChildren = testParent.get('children').get('grandChildren');
+	tPGrandChildren.pushObject(GrandchildDictionaryC);
+	equals(tPGrandChildren.get('length'), 2, "Pushing the first grandchild dictionary onto the child's grandchildren gives a grandchildren length of 2.")
+
+	tPGrandChildren.pushObject(GrandchildDictionaryD);
+	equals(tPGrandChildren.get('length'), 3, "Pushing the second grandchild dictionary onto the child's grandchildren gives a grandchildren length of 3.")
+
+});
+
+test("Push child dictionaries to a parent record's array of children", function(){
+	var tPChildren = testParent.get('children');
+	children.pushObject(ChildDictionaryC);
+	equals(children.get('length'), 2, "Pushing the first child dictionary onto the parent's children gives a children length of 2.")
+
+	children.pushObject(ChildDictionaryD); // FAILS currently with a stack blowout - OM 100511
+	equals(children.get('length'), 3, "Pushing the second child dictionary onto the parent's children gives a children length of 3.")
+	
+});
+
+
+
+})();
+</script>
+
+  <script>
+  SC.benchmarkPreloadEvents['bodyEnd'] = new Date().getTime();
+  </script>
+	</body>
+</html>
