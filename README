@@ -15,3 +15,5 @@ Run NestedRecordsTest.runTests() in the console to see the issue in action. This
 
 I've created an analogous test case in the models folder, which I could tweak if anyone knew how to make the issue appear in the testing environment. That's at:
 https://github.com/OliverM/nested_records_test/blob/master/apps/nested_records_test/tests/models/nested_record_complex_array_pushObj.js
+
+UPDATE 11/07/11: This has been resolved; the error starts due to createRecord() trying to handle an attribute hash that includes some full SC.Records in the nested record array. Read the full embarrassing tale at https://github.com/sproutcore/sproutcore/issues/545

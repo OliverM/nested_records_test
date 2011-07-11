@@ -89,7 +89,7 @@ NestedRecordsTest = SC.Application.create(
 	},
 	
 	// series of tests displaying the issue
-	runTests: function(){
+	runTests: function(){ // includes my utility record creation fns defined above, which is where the problem lies.
 		
 		// name the objects of interest
 		var parent = NestedRecordsTest.store.find(NestedRecordsTest.Parent).objectAt(0);
@@ -109,7 +109,136 @@ NestedRecordsTest = SC.Application.create(
 		children.pushObject(NestedRecordsTest.createChild()); // fails
 		children.pushObject(NestedRecordsTest.createChild()); // fails
 		console.log('Total number of children should be 4. Actual number: %@'.fmt(grandChildren.get('length')));
+	},
+	
+	runCreatedTests:function(){		
+		// name the objects of interest
+		var parent = NestedRecordsTest.store.createRecord(NestedRecordsTest.Parent, {parentName:'createdParent', testChildren:[]});
 		
+		var children = parent.get('testChildren');
+		children.pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'createdChild', grandChildren:[]}));
+		
+		var grandChildren = children.objectAt(0).get('grandChildren');
+		grandChildren.pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'createdGrandchild', greatGrandChildren:[]}));
+		
+		console.log('Test adding objects with one level of nesting to collection of an object with two levels of nesting.');
+		console.log('Pushing three grandchildren...');
+		grandChildren.pushObject(NestedRecordsTest.createGrandChild());
+		grandChildren.pushObject(NestedRecordsTest.createGrandChild());
+		grandChildren.pushObject(NestedRecordsTest.createGrandChild());
+		console.log('Total number of grandchildren should be 4. Actual number: %@'.fmt(grandChildren.get('length')));
+		
+		console.log('Test adding objects with two level of nesting to collection of an object with three levels of nesting.');
+		console.log('Pushing three children...');
+		children.pushObject(NestedRecordsTest.createChild());
+		children.pushObject(NestedRecordsTest.createChild()); // passes
+		children.pushObject(NestedRecordsTest.createChild()); // passes
+		console.log('Total number of children should be 4. Actual number: %@'.fmt(grandChildren.get('length')));
 	}
-
+	
 }) ;
+
+// //create parent
+// parent2 = NestedRecordsTest.store.createRecord(NestedRecordsTest.Parent, {parentName:'ParentB', testChildren: []})
+// 
+// //add several children to parent
+// parent2.get('testChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'ChildB', grandChildren:[]}))
+// parent2.get('testChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'ChildC', grandChildren:[]}))
+// parent2.get('testChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'ChildD', grandChildren:[]}))
+// parent2.get('testChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'ChildE', grandChildren:[]}))
+// 
+// // add grandchildren to the third child
+// parent2.get('testChildren').objectAt(2).get('grandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'GrandchildC', greatGrandChildren:[]}))
+// parent2.get('testChildren').objectAt(2).get('grandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'GrandchildD', greatGrandChildren:[]}))
+// parent2.get('testChildren').objectAt(2).get('grandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'GrandchildE', greatGrandChildren:[]}))
+// parent2.get('testChildren').objectAt(2).get('grandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'GrandchildF', greatGrandChildren:[]}))
+// 
+// //check number of third child's grandchildren = 4
+// parent2.get('testChildren').objectAt(2).get('grandChildren').get('length')
+// 
+// //add great-grandchildren to the third child's third grandchild
+// parent2.get('testChildren').objectAt(2).get('grandChildren').objectAt(2).get('greatGrandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'Great-grandchildB'}))
+// parent2.get('testChildren').objectAt(2).get('grandChildren').objectAt(2).get('greatGrandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'Great-grandchildC'}))
+// parent2.get('testChildren').objectAt(2).get('grandChildren').objectAt(2).get('greatGrandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'Great-grandchildD'}))
+// 
+// // add grandchildren to the fourth child
+// parent2.get('testChildren').objectAt(3).get('grandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'GrandchildG', greatGrandChildren:[]}))
+// parent2.get('testChildren').objectAt(3).get('grandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'GrandchildH', greatGrandChildren:[]}))
+// parent2.get('testChildren').objectAt(3).get('grandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'GrandchildI', greatGrandChildren:[]}))
+// parent2.get('testChildren').objectAt(3).get('grandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'GrandchildJ', greatGrandChildren:[]}))
+// 
+// //add great-grandchildren to the fourth child's third grandchild
+// parent2.get('testChildren').objectAt(3).get('grandChildren').objectAt(2).get('greatGrandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'Great-grandchildE'}))
+// parent2.get('testChildren').objectAt(3).get('grandChildren').objectAt(2).get('greatGrandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'Great-grandchildF'}))
+// parent2.get('testChildren').objectAt(3).get('grandChildren').objectAt(2).get('greatGrandChildren').pushObject(NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'Great-grandchildG'}))
+
+
+//attempt to co-alesce the above into three function calls:
+
+// create the parent (as previously)
+// failParent = NestedRecordsTest.store.createRecord(NestedRecordsTest.Parent, {parentName:'failParent', testChildren: []})
+// 
+// // create the third child structure
+// failChild1 = NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'failChildA', 
+//   grandChildren:[
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildA', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildB', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildC', greatGrandChildren:[
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildA'}),
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildB'}),
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildC'})]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildD', greatGrandChildren:[]})]})
+// 
+// // create the third child structure
+// failChild2 = NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'failChildB', 
+//   grandChildren:[
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildE', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildF', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildG', greatGrandChildren:[
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildD'}),
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildE'}),
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildF'})]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildH', greatGrandChildren:[]})]})
+// 
+// failChild3 = NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'failChildC', 
+//   grandChildren:[
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildA', greatGrandChildren:[
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildA'}),
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildB'}),
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildC'})]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildB', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildC', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildD', greatGrandChildren:[]})]})
+// 
+// failChild4 = 	NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'failChildC', 
+//   grandChildren:[
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildA', greatGrandChildren:[
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildA'}),
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildB'}),
+// 	    NestedRecordsTest.store.createRecord(NestedRecordsTest.GreatGrandchild,{greatGrandchildName: 'failGreat-grandchildC'})]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildB', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildC', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildD', greatGrandChildren:[]})]})
+// 
+// 
+// // attempt to pin down where in the record creation utility fns we're going wrong
+// failChild5 = 	NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'failChildC', 
+//   grandChildren:[
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildA', greatGrandChildren:NestedRecordsTest.createGreatGrandChildren(3)}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildB', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildC', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildD', greatGrandChildren:[]})]})
+// 
+// failChild6 = 	NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'failChildC', 
+//   grandChildren:[
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildA', greatGrandChildren:NestedRecordsTest.createGreatGrandChildren(3)}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildB', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildC', greatGrandChildren:[]}), 
+//     NestedRecordsTest.store.createRecord(NestedRecordsTest.Grandchild, {grandchildName:'failGrandchildD', greatGrandChildren:[]})]})
+// 
+// failChild7 = 	NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'failChildC', grandChildren:NestedRecordsTest.createGrandChildren(3)})
+// 
+// failChild8 = 	NestedRecordsTest.store.createRecord(NestedRecordsTest.Child, {childName:'failChildC', grandChildren:NestedRecordsTest.createGrandChildren(3)})
+// 
+// failChild9 = NestedRecordsTest.createChild()
+// failChild10 = NestedRecordsTest.createChild()
